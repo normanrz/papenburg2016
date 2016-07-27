@@ -8,22 +8,36 @@ internal_links_re = re.compile("\[\[([^\]]+)\]\]")
 external_links_re = re.compile("\[([a-z]+:[^\]\s]+)\s+([^\]]+)\]")
 cross_links_re = re.compile("\{\{([^\}]+)\}\}")
 html_tags_re = re.compile("<[^>]+>")
+filter_title_re = re.compile("^(File:|User:|Talk:|User talk:|Template:|User blog comment:|User blog:|Category:)")
 
 
 def load_wikidata(filename):
+    if filename.endswith(".gz"):
+        return load_wikidata_gzip(filename)
+    else:
+        return load_wikidata_normal(filename)
+
+
+def load_wikidata_normal(filename):
     with open(filename, "rt", encoding="UTF-8") as f:
         for line in f:
             doc = json.loads(line)
-            doc["byteOffset"] = 0
-            yield doc
+            if not filter_title(doc["title"]):
+                doc["byteOffset"] = 0
+                yield doc
 
 
 def load_wikidata_gzip(filename):
     with gzip.open(filename, "rt", encoding="UTF-8") as f:
         for line in f:
             doc = json.loads(line)
-            doc["byteOffset"] = 0
-            yield doc
+            if not filter_title(doc["title"]):
+                doc["byteOffset"] = 0
+                yield doc
+
+
+def filter_title(title):
+    return bool(filter_title_re.match(title))
 
 
 def find_internal_links(doc_text):
@@ -44,8 +58,3 @@ def clean_wikidata(doc_text):
 def load_wikidata_texts(filename):
     for doc in load_wikidata(filename):
         yield clean_wikidata(doc["text"])
-
-
-if __name__ == "__main__":
-    for _doc in load_wikidata_gzip(sys.argv[1]):
-        print(clean_wikidata(_doc["text"]))
