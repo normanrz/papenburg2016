@@ -44,8 +44,3 @@ def clean_wikidata(doc_text):
 def load_wikidata_texts(filename):
     for doc in load_wikidata(filename):
         yield clean_wikidata(doc["text"])
-
-
-if __name__ == "__main__":
-    for _doc in load_wikidata_gzip(sys.argv[1]):
-        print(clean_wikidata(_doc["text"]))
