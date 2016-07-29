@@ -1,10 +1,13 @@
 from preprocess import tokenize_and_stem
+import math
 import pickle
 
 with open("index.pickle", "rb") as f:
     index = pickle.load(f)
 with open("doc_titles.pickle", "rb") as f:
     doc_titles = pickle.load(f)
+
+N = len(doc_titles)
 
 while True:
     search_tokens = tokenize_and_stem(input("Query: "))
@@ -15,17 +18,20 @@ while True:
         all_docs += index[token]
     all_docs = set(all_docs)
 
-    # Calculate dot products
-    dot_docs = {}
+    # Calculate tfidf scores
+    doc_scores = {}
+    idf_values = {token: math.log(N / len(index[token])) for token in search_tokens}
     for doc_no in all_docs:
-        # dot = sum([index[token].count(doc_no) for token in search_tokens])
-        dot = 0
+        score = 0
         for token in search_tokens:
-            dot += index[token].count(doc_no)
-        dot_docs[doc_no] = dot
+            if doc_no in index[token]:
+                tf = index[token][doc_no]
+                idf = idf_values[token]
+                score += tf * idf
+        doc_scores[doc_no] = score
 
-    # Sort by dot product
-    ranked_docs = sorted(dot_docs, key=dot_docs.get, reverse=True)
+    # Sort by tfidf scores
+    ranked_docs = sorted(doc_scores, key=doc_scores.get, reverse=True)
 
     print([doc_titles[doc_no] for doc_no in ranked_docs])
     print(len(ranked_docs))

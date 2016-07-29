@@ -1,5 +1,6 @@
 import re
 from stemming.porter2 import stem
+from collections import defaultdict
 
 tokenize_re = re.compile("\w{2,}")
 digits_only_re = re.compile("^\d+$")
@@ -13,3 +14,10 @@ def tokenize(text):
 
 def tokenize_and_stem(text):
     return [stem(token) for token in tokenize(text)]
+
+
+def count_tokens(tokens):
+    counter = defaultdict(int)
+    for token in tokens:
+        counter[token] += 1
+    return counter

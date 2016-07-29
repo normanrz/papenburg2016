@@ -8,7 +8,8 @@ internal_links_re = re.compile("\[\[([^\]]+)\]\]")
 external_links_re = re.compile("\[([a-z]+:[^\]\s]+)\s+([^\]]+)\]")
 cross_links_re = re.compile("\{\{([^\}]+)\}\}")
 html_tags_re = re.compile("<[^>]+>")
-filter_title_re = re.compile("^(File:|User:|Talk:|User talk:|Template:|User blog comment:|User blog:|Category:)")
+filter_title_re = re.compile("^(File:|User:|Talk:|User talk:|Template:|User blog comment:|" \
+                             "User blog:|Category:|Category talk:|Forum:|MediaWiki:|MediaWiki talk:)")
 
 
 def load_wikidata(filename):
