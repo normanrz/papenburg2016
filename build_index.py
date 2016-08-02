@@ -1,5 +1,5 @@
 from load_dataset import load_wikidata, clean_wikidata
-from preprocess import tokenize_and_stem, count_tokens
+from preprocess import tokenize_and_stem, count_tokens, max_count_token
 from collections import defaultdict
 from os import path
 import pickle
@@ -14,7 +14,7 @@ for doc_no, doc in enumerate(load_wikidata(filename)):
     if len(tokens) == 0:
         continue
     token_counts = count_tokens(tokens)
-    max_token_count = token_counts[max(token_counts, key=token_counts.get)]
+    max_token_count = max_count_token(token_counts)
     token_set = token_counts.keys()
     for token in token_set:
         tf = token_counts[token] / max_token_count
