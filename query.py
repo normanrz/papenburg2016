@@ -20,7 +20,10 @@ while True:
 
     # Calculate tfidf scores
     doc_scores = {}
-    idf_values = {token: math.log(N / len(index[token])) for token in search_tokens}
+    idf_values = {}
+    for token in search_tokens:
+        if len(index[token]) == 0: continue
+        idf_values[token] = math.log(N / len(index[token]))
     for doc_no in all_docs:
         score = 0
         for token in search_tokens:
@@ -33,5 +36,6 @@ while True:
     # Sort by tfidf scores
     ranked_docs = sorted(doc_scores, key=doc_scores.get, reverse=True)
 
-    print([doc_titles[doc_no] for doc_no in ranked_docs])
-    print(len(ranked_docs))
+    print("## Found {} documents. Most relevant titles: ##".format(len(ranked_docs)))
+    for doc_no in ranked_docs[0:30]:
+        print(doc_titles[doc_no])
