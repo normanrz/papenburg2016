@@ -1,24 +1,10 @@
 import numpy as np
 import pickle
 from os import path
-from preprocess import *
-from load_dataset import *
+from load_dataset import load_wikidata, find_internal_links
+from build_index import filename
 from collections import Counter
 
-with open("doc_titles.pickle", "rb") as f:
-    doc_titles = pickle.load(f)
-doc_titles = set(map(lambda x:x.lower(), doc_titles))
-
-# Tut mir leid. Bin ich gewöhnt.
-all_links = set()
-num_docs = 0
-docids = {}
-doctitles = {}
-d_global = 0.85
-adj_list = []
-num_links = []
-pagerank_values_old = []
-pagerank_values = []
 
 def convert_title(link):
     div_pos = link.find('|')
@@ -26,6 +12,22 @@ def convert_title(link):
         return link.lower()[:div_pos]
     else:
         return link.lower()
+
+#filename = path.join("datasets", "pokemon_pages_current.json.gz")
+with open("doc_titles.pickle", "rb") as f:
+    doc_titles = pickle.load(f)
+doc_titles = set(map(convert_title, doc_titles))
+
+# Tut mir leid. Bin ich gewoehnt.
+all_links = set()
+num_docs = 0
+docid_of_doctitle = {}
+doctitle_of_docid = {}
+d_global = 0.85
+adj_list = []
+num_links = []
+pagerank_values_old = []
+pagerank_values = []
 
 def gather_sites():
     for doc_no, doc in enumerate(load_wikidata(filename)):
@@ -38,9 +40,9 @@ def gather_sites():
 def build_docid_mapping():
     global num_docs
     for link in all_links:
-        if link not in docids:
-            docids[link] = num_docs
-            doctitles[num_docs] = link
+        if link not in docid_of_doctitle:
+            docid_of_doctitle[link] = num_docs
+            doctitle_of_docid[num_docs] = link
             num_docs += 1
 
 def build_adj_list():
@@ -51,12 +53,12 @@ def build_adj_list():
     for doc_no, doc in enumerate(load_wikidata(filename)):
         if convert_title(doc["title"]) not in all_links: continue
         own_title = convert_title(doc["title"])
-        if (docids[own_title] in done): continue
+        if (docid_of_doctitle[own_title] in done): continue
         links = set(map(convert_title, find_internal_links(doc["text"]))).intersection(all_links)
-        num_links[docids[own_title]] = len(links)
+        num_links[docid_of_doctitle[own_title]] = len(links)
         for link in links:
-            adj_list[docids[link]].append(docids[own_title])
-        done.add(docids[own_title])
+            adj_list[docid_of_doctitle[link]].append(docid_of_doctitle[own_title])
+        done.add(docid_of_doctitle[own_title])
 
 def calc_pagerank_head():
     global pagerank_values, pagerank_values_old
@@ -86,7 +88,11 @@ build_docid_mapping()
 build_adj_list()
 calc_pagerank_head()
 pagerank_final_values = [(i, pagerank_values[i]) for i in range(num_docs)]
-pagerank_final_values = sorted(pagerank_final_values, key=lambda x:x[1], reverse=True)
-sorted_sites = map(lambda x:x[0], pagerank_final_values)
-for site in pagerank_final_values[:20]:
-    print(doctitles[site[0]], "("+str(site[1])+")")
+
+pagerank_mapping = {}
+for site in pagerank_final_values:
+    pagerank_mapping[doctitle_of_docid[site[0]]] = site[1]
+
+with open("pagerank.pickle", "wb") as f:
+    pickle.dump(pagerank_mapping, f)
+print("done")
