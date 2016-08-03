@@ -44,7 +44,7 @@ while True:
         ranked_docs.append((doc_titles[item[0]],
                             pagerank_mapping[convert_title(doc_titles[item[0]])] * item[1]))
 
-    # Sort by tfidf scores
+    # Sort by (tfidf * pagerank)
     ranked_docs = sorted(ranked_docs, key=lambda x:x[1], reverse=True)
 
     print("## Found {} documents. Most relevant titles: ##".format(len(ranked_docs)))
