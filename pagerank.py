@@ -15,6 +15,7 @@ adj_list = []
 num_links = []
 pagerank_values_old = []
 pagerank_values = []
+doc_titles = None
 
 def convert_title(link):
     # Some links have a section for the page category, which is cut
@@ -24,10 +25,6 @@ def convert_title(link):
         return link.lower()[:div_pos]
     else:
         return link.lower()
-
-with open("doc_titles.pickle", "rb") as f:
-    doc_titles = pickle.load(f)
-doc_titles = set(map(convert_title, doc_titles))
 
 def gather_sites():
     # list all documents that are actually linked to by some other
@@ -99,17 +96,22 @@ def update_pagerank_value(index):
     pagerank_values[index] += sum_pr * d_global
 
 
-gather_sites()
-build_docid_mapping()
-build_adj_list()
-calc_pagerank_head()
-pagerank_final_values = [(i, pagerank_values[i]) for i in range(num_docs)]
+if __name__ == "__main__":
+    with open("doc_titles.pickle", "rb") as f:
+        doc_titles = pickle.load(f)
+    doc_titles = set(map(convert_title, doc_titles))
 
-# map document titles to their respective pagerank values
-pagerank_mapping = {}
-for site in pagerank_final_values:
-    pagerank_mapping[doctitle_of_docid[site[0]]] = site[1]
+    gather_sites()
+    build_docid_mapping()
+    build_adj_list()
+    calc_pagerank_head()
+    pagerank_final_values = [(i, pagerank_values[i]) for i in range(num_docs)]
 
-with open("pagerank.pickle", "wb") as f:
-    pickle.dump(pagerank_mapping, f)
-print("done")
+    # map document titles to their respective pagerank values
+    pagerank_mapping = {}
+    for site in pagerank_final_values:
+        pagerank_mapping[doctitle_of_docid[site[0]]] = site[1]
+
+    with open("pagerank.pickle", "wb") as f:
+        pickle.dump(pagerank_mapping, f)
+    print("done")

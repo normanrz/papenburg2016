@@ -13,7 +13,6 @@ filter_title_re = re.compile("^(File:|User:|Talk:|User talk:|Template:|User blog
                              "Category:|Board:|Quiz:|QuizArticle:|Category talk:|Forum:|" \
                              "MediaWiki:|MediaWiki talk:|Kategorie:|Datei:|Wikipedia:)")
 
-
 def load_wikidata(filename):
     if filename.endswith(".gz"):
         return load_wikidata_gzip(filename)
