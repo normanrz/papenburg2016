@@ -4,7 +4,7 @@ from collections import defaultdict
 from os import path
 import pickle
 
-filename = path.join("datasets", "pokemon_pages_current.json.gz")
+filename = path.join("datasets", "pokemon.json.gz")
 index = defaultdict(dict)
 
 doc_titles = [doc["title"] for doc in load_wikidata(filename)]
