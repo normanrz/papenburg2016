@@ -24,23 +24,23 @@ def suche():
 	results2=results
 	for i in results2:
 			resultlbl.insert(END, i[0]) # name,text
-	resultlbl.config(state="disabled")
+	# resultlbl.config(state="disabled")
 	countlbl.config(text=("Es wurden\n {} \nErgebnisse \n gefunden.").format(str(len(results2))))
 
-#def eingabe(event):
- #       suche()
-#searchfield.bind('<KeyPress-Return>',eingabe)
 
 def click(event):
-	print(resultlbl.get('first'))
-	listeAusgewaehlt = resultlbl.curselection()
-	print (listeAusgewaehlt)
+	#print(event.widget())
+	print(resultlbl.get(ACTIVE))
+	listeAusgewaehlt = event.widget.curselection()
+	print(listeAusgewaehlt)
 	itemAusgewaehlt = listeAusgewaehlt[0]
 	nameAusgewaehlt = resultlbl.get(itemAusgewaehlt)
 	print(index, "HALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 	erg=results[index][1]
 	os.system(str(erg))
 
+def internet():
+	weblink = lb
 global resultlbl
 frame1 = Frame(top)
 searchlbl = Label(top, text="Suche Eingeben:", font=("Arial", 25, "bold"))
@@ -54,7 +54,7 @@ resultlbl.bind('<Double-Button-1>', click)
 countlbl = Label(top, text=("Es wurden\n 0 \nErgebnisse \n gefunden."), width=10, font=("Arial", 12, "bold"))
 
 resultscroller.config(command=resultlbl.yview)
-resultlbl.config(yscrollcommand=resultscroller.set, state="disabled")
+resultlbl.config(yscrollcommand=resultscroller.set)
 frame1.grid(row=1, columnspan=2)
 # frame2.grid()
 searchlbl.grid(row=0, column=0, sticky=N + S + E + W)
@@ -64,6 +64,10 @@ countlbl.grid(row=1, column=3)
 resultlbl.pack(side=LEFT, fill=Y)
 
 resultscroller.pack(side=RIGHT, fill=Y)
+
+def eingabe(event):
+	suche()
+searchfield.bind('<KeyPress-Return>',eingabe)
 
 top.mainloop()
 
