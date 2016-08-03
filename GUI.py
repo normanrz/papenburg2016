@@ -1,3 +1,5 @@
+from tkinter.messagebox import showinfo
+
 from query import query
 from cgitb import text
 from tkinter import *
@@ -6,7 +8,8 @@ query = VectorSpace.search
 results=0
 import os
 import sys
-
+from threading import Thread
+import winsound
 
 top = Tk()
 top.geometry("1050x300+300+100")
@@ -15,8 +18,10 @@ top.grid()
 top.resizable(0, 0)
 top.config(background='lightpink')
 
-
+def kiss():
+	winsound.PlaySound("kiss.wav",winsound.SND_FILENAME)
 def suche():
+	Thread(target=kiss).start()
 	global results
 	resultlbl.config(state="normal")
 	resultlbl.delete(0,END)
@@ -29,15 +34,13 @@ def suche():
 
 
 def click(event):
-	#print(event.widget())
-	print(resultlbl.get(ACTIVE))
-	listeAusgewaehlt = event.widget.curselection()
-	print(listeAusgewaehlt)
+	Thread(target=kiss).start()
+	listeAusgewaehlt = resultlbl.curselection()
 	itemAusgewaehlt = listeAusgewaehlt[0]
-	nameAusgewaehlt = resultlbl.get(itemAusgewaehlt)
-	print(index, "HALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-	erg=results[index][1]
-	os.system(str(erg))
+	erg=results[itemAusgewaehlt][1]
+	articel=open(erg, "r").read()
+	print(articel)
+	showinfo(message=articel)
 
 def internet():
 	weblink = lb
@@ -67,7 +70,7 @@ resultscroller.pack(side=RIGHT, fill=Y)
 
 def eingabe(event):
 	suche()
-searchfield.bind('<KeyPress-Return>',eingabe)
+searchfield.bind('<KeyPress-Return>', eingabe)
 
 top.mainloop()
 
